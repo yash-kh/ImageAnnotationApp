@@ -10,13 +10,39 @@
     <canvas #imageCanvas></canvas>
   </div>
   <div class="controls" *ngIf="capturedImage">
-    <button mat-raised-button color="primary" (click)="addShape('polygon')">Add Polygon</button>
-    <button mat-raised-button color="primary" (click)="addShape('polyline')">Add Polyline</button>
-    <button mat-raised-button color="primary" (click)="addShape('rectangle')">Add Rectangle</button>
-    <button mat-raised-button color="accent" (click)="exportAnnotations()">Export Annotations</button>
-    <button mat-raised-button color="warn" (click)="exportImage('png')">Export Image (PNG)</button>
-    <button mat-raised-button color="warn" (click)="exportImage('jpg')">Export Image (JPG)</button>
-    <button mat-raised-button (click)="undo()">Undo</button>
-    <button mat-raised-button (click)="redo()">Redo</button>
+    <button mat-raised-button color="primary" (click)="addShape('polygon')">
+      Add Polygon
+    </button>
+    <button mat-raised-button color="primary" (click)="addShape('polyline')">
+      Add Polyline
+    </button>
+    <button mat-raised-button color="primary" (click)="addShape('rectangle')">
+      Add Rectangle
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="undo()"
+      [disabled]="this.historyIndex <= 0"
+    >
+      Undo
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="redo()"
+      [disabled]="this.historyIndex >= this.history.length - 1"
+    >
+      Redo
+    </button>
+    <button mat-raised-button color="accent" (click)="exportAnnotations()">
+      Export Annotations
+    </button>
+    <button mat-raised-button color="warn" (click)="exportImage('png')">
+      Export Image (PNG)
+    </button>
+    <button mat-raised-button color="warn" (click)="exportImage('jpg')">
+      Export Image (JPG)
+    </button>
   </div>
 </div>

@@ -7,29 +7,29 @@ import * as fabric from 'fabric';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    RouterOutlet,
-    CommonModule,
-    MatButtonModule,
-  ],
+  imports: [RouterOutlet, CommonModule, MatButtonModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements AfterViewInit {
   title = 'ImageAnnotationApp';
   capturedImage: string | ArrayBuffer | null = null;
+  history: string[] = [];
+  historyIndex = -1;
 
   @ViewChild('imageCanvas') imageCanvas!: ElementRef<HTMLCanvasElement>;
   private canvas!: fabric.Canvas;
-  private history: string[] = [];
-  private historyIndex = -1;
 
   ngAfterViewInit(): void {
     const canvasElement = this.imageCanvas.nativeElement;
+    const { innerWidth: width } = window;
+
     this.canvas = new fabric.Canvas(canvasElement, {
-      width: canvasElement.width,
-      height: canvasElement.height,
+      width: width,
+      height: 400,
     });
+    this.canvas.setWidth(width);
+    this.canvas.setHeight(400);
     this.canvas.isDrawingMode = false;
 
     this.canvas.on('object:modified', this.saveState.bind(this));
@@ -48,6 +48,12 @@ export class AppComponent implements AfterViewInit {
         const img = new Image();
         img.onload = () => {
           const { width, height } = img;
+          const canvasWidth = this.canvas.getWidth();
+          const canvasHeight = this.canvas.getHeight();
+
+          let scale = Math.min(canvasWidth / width, canvasHeight / height);
+          let imgWidth = width * scale;
+          let imgHeight = height * scale;
 
           if (height > width) {
             // Rotate the image
@@ -62,13 +68,20 @@ export class AppComponent implements AfterViewInit {
             rotatedCtx.drawImage(img, -width / 2, -height / 2);
             const rotatedImg = new Image();
             rotatedImg.onload = () => {
-              this.canvas.setWidth(rotatedImg.width);
-              this.canvas.setHeight(rotatedImg.height);
+              scale = Math.min(
+                canvasWidth / rotatedImg.width,
+                canvasHeight / rotatedImg.height
+              );
+              imgWidth = rotatedImg.width * scale;
+              imgHeight = rotatedImg.height * scale;
+
+              this.canvas.setWidth(imgWidth);
+              this.canvas.setHeight(imgHeight);
               const backgroundImage = new fabric.Image(rotatedImg, {
                 left: 0,
                 top: 0,
-                scaleX: rotatedImg.width / rotatedImg.width,
-                scaleY: rotatedImg.height / rotatedImg.height,
+                scaleX: imgWidth / rotatedImg.width,
+                scaleY: imgHeight / rotatedImg.height,
               });
               this.canvas.backgroundImage = backgroundImage;
               this.capturedImage = this.canvas.toDataURL();
@@ -77,13 +90,13 @@ export class AppComponent implements AfterViewInit {
             rotatedImg.src = rotatedCanvas.toDataURL();
           } else {
             // Set image as background without rotation
-            this.canvas.setWidth(width);
-            this.canvas.setHeight(height);
+            this.canvas.setWidth(imgWidth);
+            this.canvas.setHeight(imgHeight);
             const backgroundImage = new fabric.Image(img, {
               left: 0,
               top: 0,
-              scaleX: width / img.width,
-              scaleY: height / img.height,
+              scaleX: imgWidth / img.width,
+              scaleY: imgHeight / img.height,
             });
             this.canvas.backgroundImage = backgroundImage;
             this.capturedImage = this.canvas.toDataURL();
@@ -119,7 +132,6 @@ export class AppComponent implements AfterViewInit {
           [
             { x: 100, y: 100 },
             { x: 200, y: 100 },
-            { x: 150, y: 200 },
           ],
           {
             fill: 'transparent',
@@ -186,11 +198,13 @@ export class AppComponent implements AfterViewInit {
     const state = this.canvas.toJSON();
     const stateString = JSON.stringify(state);
 
-    if (this.historyIndex === -1 || stateString !== this.history[this.historyIndex]) {
+    if (
+      this.historyIndex === -1 ||
+      stateString !== this.history[this.historyIndex]
+    ) {
       this.history = this.history.slice(0, this.historyIndex + 1);
       this.history.push(stateString);
       this.historyIndex++;
-      console.log('State saved:', this.historyIndex, this.history);
     }
   }
 
@@ -198,9 +212,10 @@ export class AppComponent implements AfterViewInit {
     if (this.historyIndex > 0) {
       this.historyIndex--;
       const previousState = this.history[this.historyIndex];
-      console.log('Undo:', JSON.parse(previousState));
-      this.canvas.loadFromJSON(previousState, this.canvas.renderAll.bind(this.canvas));
-      console.log('Undo:', this.historyIndex);
+      this.canvas.loadFromJSON(previousState);
+      setTimeout(() => {
+        this.canvas.renderAll();
+      }, 1);
     }
   }
 
@@ -208,8 +223,10 @@ export class AppComponent implements AfterViewInit {
     if (this.historyIndex < this.history.length - 1) {
       this.historyIndex++;
       const nextState = this.history[this.historyIndex];
-      this.canvas.loadFromJSON(nextState, this.canvas.renderAll.bind(this.canvas));
-      console.log('Redo:', this.historyIndex);
+      this.canvas.loadFromJSON(nextState);
+      setTimeout(() => {
+        this.canvas.renderAll();
+      }, 1);
     }
   }
 }
