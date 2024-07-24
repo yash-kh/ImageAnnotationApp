@@ -25,13 +25,26 @@
   <span *ngIf="capturedImage">Edit Image</span>
   <div class="controls" *ngIf="capturedImage">
     <button mat-raised-button color="primary" (click)="addShape('polygon')">
-      <i class="fas fa-plus"></i> Polygon
-    </button>
-    <button mat-raised-button color="primary" (click)="addShape('polyline')">
-      <i class="fas fa-plus"></i> Polyline
+      <i class="fas fa-plus"></i> Triangle
     </button>
     <button mat-raised-button color="primary" (click)="addShape('rectangle')">
       <i class="fas fa-plus"></i> Rectangle
+    </button>
+    <button
+      *ngIf="!isDrawing"
+      mat-raised-button
+      color="primary"
+      (click)="toggleDrawingMode()"
+    >
+      <i class="fas fa-pencil-alt"></i> Draw Line
+    </button>
+    <button
+      *ngIf="isDrawing"
+      mat-raised-button
+      color="primary"
+      (click)="toggleDrawingMode()"
+    >
+      <i class="fa-solid fa-circle-stop"></i> Stop Drawing
     </button>
     <button
       mat-raised-button

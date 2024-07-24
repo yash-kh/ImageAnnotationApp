@@ -16,9 +16,12 @@ export class AppComponent implements AfterViewInit {
   capturedImage: string | ArrayBuffer | null = null;
   history: string[] = [];
   historyIndex = -1;
+  isDrawing = false;
+  private canvas!: fabric.Canvas;
+  private drawingLine: fabric.Line | null = null;
+  private snapThreshold = 10;
 
   @ViewChild('imageCanvas') imageCanvas!: ElementRef<HTMLCanvasElement>;
-  private canvas!: fabric.Canvas;
 
   ngAfterViewInit(): void {
     const canvasElement = this.imageCanvas.nativeElement;
@@ -33,6 +36,9 @@ export class AppComponent implements AfterViewInit {
     this.canvas.isDrawingMode = false;
 
     this.canvas.on('object:modified', this.saveState.bind(this));
+    this.canvas.on('mouse:down', this.onMouseDown.bind(this));
+    this.canvas.on('mouse:move', this.onMouseMove.bind(this));
+    this.canvas.on('mouse:up', this.onMouseUp.bind(this));
   }
 
   captureImage(event: Event): void {
@@ -254,5 +260,76 @@ export class AppComponent implements AfterViewInit {
     this.canvas.clear(); // Clear the canvas
     this.history = []; // Clear the history
     this.historyIndex = -1; // Reset the history index
+  }
+
+  toggleDrawingMode(): void {
+    this.isDrawing = !this.isDrawing;
+    this.canvas.isDrawingMode = this.isDrawing;
+  }
+
+  onMouseDown(event: fabric.TEvent): void {
+    if (!this.isDrawing) return;
+    const pointer = this.canvas.getPointer(event.e);
+    this.drawingLine = new fabric.Line(
+      [pointer.x, pointer.y, pointer.x, pointer.y],
+      {
+        stroke: 'blue',
+        strokeWidth: 2,
+      }
+    );
+    this.canvas.add(this.drawingLine);
+  }
+
+  onMouseMove(event: fabric.TEvent): void {
+    if (!this.isDrawing || !this.drawingLine) return;
+    const pointer = this.canvas.getPointer(event.e);
+    this.drawingLine.set({ x2: pointer.x, y2: pointer.y });
+    this.canvas.renderAll();
+  }
+
+  onMouseUp(event: fabric.TEvent): void {
+    if (!this.isDrawing || !this.drawingLine) return;
+
+    const lines = this.canvas.getObjects('line') as fabric.Line[];
+    const pointer = this.canvas.getPointer(event.e);
+    this.drawingLine.set({ x2: pointer.x, y2: pointer.y });
+
+    // Check for line snapping
+    lines.forEach((line) => {
+      if (!this.drawingLine) return;
+      if (line !== this.drawingLine) {
+        const line1Start = { x: this.drawingLine.x1, y: this.drawingLine.y1 };
+        const line1End = { x: this.drawingLine.x2, y: this.drawingLine.y2 };
+        const line2Start = { x: line.x1, y: line.y1 };
+        const line2End = { x: line.x2, y: line.y2 };
+
+        if (this.getDistance(line1End, line2Start) < this.snapThreshold) {
+          this.drawingLine.set({ x2: line2Start.x, y2: line2Start.y });
+        } else if (this.getDistance(line1End, line2End) < this.snapThreshold) {
+          this.drawingLine.set({ x2: line2End.x, y2: line2End.y });
+        } else if (
+          this.getDistance(line1Start, line2Start) < this.snapThreshold
+        ) {
+          this.drawingLine.set({ x1: line2Start.x, y1: line2Start.y });
+        } else if (
+          this.getDistance(line1Start, line2End) < this.snapThreshold
+        ) {
+          this.drawingLine.set({ x1: line2End.x, y1: line2End.y });
+        }
+      }
+    });
+
+    this.canvas.renderAll();
+    this.saveState();
+    this.drawingLine = null;
+  }
+
+  getDistance(
+    point1: { x: number; y: number },
+    point2: { x: number; y: number }
+  ): number {
+    return Math.sqrt(
+      Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2)
+    );
   }
 }
