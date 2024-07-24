@@ -1,7 +1,22 @@
 <div class="container">
-  <input type="file" accept="image/*" capture="environment" (change)="captureImage($event)">
-  <div *ngIf="capturedImage" class="image-container">
-    <img [src]="capturedImage" alt="Captured Image" />
+  <input
+    type="file"
+    accept="image/*"
+    capture="environment"
+    (change)="captureImage($event)"
+    class="file-input"
+  />
+  <div class="image-container">
+    <canvas #imageCanvas></canvas>
   </div>
-  <canvas #imageCanvas hidden></canvas>
+  <div class="controls" *ngIf="capturedImage">
+    <button mat-raised-button color="primary" (click)="addShape('polygon')">Add Polygon</button>
+    <button mat-raised-button color="primary" (click)="addShape('polyline')">Add Polyline</button>
+    <button mat-raised-button color="primary" (click)="addShape('rectangle')">Add Rectangle</button>
+    <button mat-raised-button color="accent" (click)="exportAnnotations()">Export Annotations</button>
+    <button mat-raised-button color="warn" (click)="exportImage('png')">Export Image (PNG)</button>
+    <button mat-raised-button color="warn" (click)="exportImage('jpg')">Export Image (JPG)</button>
+    <button mat-raised-button (click)="undo()">Undo</button>
+    <button mat-raised-button (click)="redo()">Redo</button>
+  </div>
 </div>
