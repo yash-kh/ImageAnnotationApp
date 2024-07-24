@@ -131,12 +131,12 @@ export class AppComponent implements AfterViewInit {
         shape = new fabric.Polyline(
           [
             { x: 100, y: 100 },
-            { x: 200, y: 100 },
+            { x: 300, y: 100 },
           ],
           {
             fill: 'transparent',
             stroke: 'blue',
-            strokeWidth: 2,
+            strokeWidth: 3,
           }
         );
         break;
@@ -187,7 +187,26 @@ export class AppComponent implements AfterViewInit {
       console.error('Unsupported format');
       return;
     }
+
+    // Increase canvas size for high resolution export
+    const scaleFactor = 2;
+    const originalWidth = this.canvas.getWidth();
+    const originalHeight = this.canvas.getHeight();
+
+    this.canvas.setWidth(originalWidth * scaleFactor);
+    this.canvas.setHeight(originalHeight * scaleFactor);
+    this.canvas.setZoom(scaleFactor);
+
+    // Render the canvas with high resolution
+    this.canvas.renderAll();
+
     const dataURL = this.canvas.toDataURL();
+
+    // Reset canvas size and zoom
+    this.canvas.setWidth(originalWidth);
+    this.canvas.setHeight(originalHeight);
+    this.canvas.setZoom(1);
+
     const a = document.createElement('a');
     a.href = dataURL;
     a.download = `annotated-image.${format}`;
@@ -228,5 +247,12 @@ export class AppComponent implements AfterViewInit {
         this.canvas.renderAll();
       }, 1);
     }
+  }
+
+  exitCaptureMode(): void {
+    this.capturedImage = null; // Clear captured image
+    this.canvas.clear(); // Clear the canvas
+    this.history = []; // Clear the history
+    this.historyIndex = -1; // Reset the history index
   }
 }

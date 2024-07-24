@@ -1,23 +1,37 @@
 <div class="container">
-  <input
-    type="file"
-    accept="image/*"
-    capture="environment"
-    (change)="captureImage($event)"
-    class="file-input"
-  />
+  <label class="capture-image-button" *ngIf="!capturedImage">
+    <input
+      type="file"
+      accept="image/*"
+      capture="environment"
+      (change)="captureImage($event)"
+    />
+    <span><i class="fas fa-camera"></i> Capture Image</span>
+  </label>
+  <div *ngIf="capturedImage">
+    <h3>
+      Try Annotations
+      <button mat-button color="warn" (click)="exitCaptureMode()">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </button>
+    </h3>
+  </div>
+  <div class="controls" *ngIf="!capturedImage">
+    <p>Please capture an image first.</p>
+  </div>
   <div class="image-container">
     <canvas #imageCanvas></canvas>
   </div>
+  <span *ngIf="capturedImage">Edit Image</span>
   <div class="controls" *ngIf="capturedImage">
     <button mat-raised-button color="primary" (click)="addShape('polygon')">
-      Add Polygon
+      <i class="fas fa-plus"></i> Polygon
     </button>
     <button mat-raised-button color="primary" (click)="addShape('polyline')">
-      Add Polyline
+      <i class="fas fa-plus"></i> Polyline
     </button>
     <button mat-raised-button color="primary" (click)="addShape('rectangle')">
-      Add Rectangle
+      <i class="fas fa-plus"></i> Rectangle
     </button>
     <button
       mat-raised-button
@@ -25,7 +39,7 @@
       (click)="undo()"
       [disabled]="this.historyIndex <= 0"
     >
-      Undo
+      <i class="fa-solid fa-rotate-left"></i>
     </button>
     <button
       mat-raised-button
@@ -33,8 +47,11 @@
       (click)="redo()"
       [disabled]="this.historyIndex >= this.history.length - 1"
     >
-      Redo
+      <i class="fa-solid fa-rotate-right"></i>
     </button>
+  </div>
+  <span *ngIf="capturedImage">Export</span>
+  <div class="controls" *ngIf="capturedImage">
     <button mat-raised-button color="accent" (click)="exportAnnotations()">
       Export Annotations
     </button>
