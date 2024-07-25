@@ -17,7 +17,7 @@ export class AppComponent implements AfterViewInit {
   history: string[] = [];
   historyIndex = -1;
   isDrawing = false;
-  private canvas!: fabric.Canvas;
+  canvas!: fabric.Canvas;
   private drawingLine: fabric.Line | null = null;
   private snapThreshold = 10;
 
