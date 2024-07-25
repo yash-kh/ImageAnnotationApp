@@ -1,27 +1,79 @@
 # ImageAnnotationApp
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.1.1.
+## Overview
 
-## Development server
+`ImageAnnotationApp` is an Angular application that allows users to capture images, annotate them with various shapes and lines, and export both the annotated images and their annotations. It utilizes Fabric.js for canvas manipulation and Angular Material for UI components.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+- **Capture Image:** Capture images directly from the device camera.
+- **Annotate Image:** Add shapes (polygon, polyline, rectangle) and draw freehand lines on the captured image.
+- **Export:** Export the annotated image in PNG or JPG format and save the annotations in JSON format.
+- **Undo/Redo:** Navigate through annotation changes with undo and redo functionality.
+- **Drawing Mode:** Toggle drawing mode for freehand line drawing with snapping functionality.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Setup
 
-## Build
+### Prerequisites
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- Node.js (v14 or later)
+- Angular CLI (v12 or later)
 
-## Running unit tests
+### Installation
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+1. **Clone the Repository**
 
-## Running end-to-end tests
+   ```bash
+   git clone <repository-url>
+   cd ImageAnnotationApp
+   ```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+2. **Install Dependencies**
 
-## Further help
+   ```bash
+   npm install
+   ```
+3. **Build the Project**
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+   ```bash
+   ng build
+   ```
+4. **Serve the Application**
+
+   ```bash
+   ng serve
+   ```
+## Usage
+
+1. **Capture an Image**
+
+   Click the "Capture Image" button to open the file picker and select an image.
+
+2. **Annotate the Image**
+
+   - Use the controls to add shapes (triangle, rectangle) or draw freehand lines.
+   - Use the "Undo" and "Redo" buttons to navigate through annotation changes.
+
+3. **Export**
+
+   - Click "Export Annotations" to save the annotations as a JSON file.
+   - Click "Export Image (PNG)" or "Export Image (JPG)" to save the annotated image in the desired format.
+
+4. **Exit Capture Mode**
+
+   Click the "Exit" button to clear the captured image and reset the canvas.
+
+## Assumptions
+
+- The application assumes that images will be captured in a standard format (e.g., JPEG or PNG).
+- The application does not handle image rotation beyond 90 degrees (landscape to portrait).
+- The canvas size is set to a fixed height of 400 pixels; resizing may be necessary for different screen sizes.
+
+## Libraries and Tools Used
+
+- **Fabric.js:** A library for canvas manipulation that simplifies drawing and interaction on the canvas. It was chosen for its ease of use in creating and managing shapes, lines, and images on the canvas.
+
+- **Angular Material:** A UI component library for Angular that provides a set of reusable and well-designed UI components. It was selected for its consistent styling and ease of integration with Angular applications.
+
+- **Font Awesome:** An icon library that offers a wide range of icons. It was used for its comprehensive set of icons that enhance the user interface with visually appealing and meaningful symbols.
+

@@ -66,13 +66,13 @@
   <span *ngIf="capturedImage">Export</span>
   <div class="controls" *ngIf="capturedImage">
     <button mat-raised-button color="accent" (click)="exportAnnotations()">
-      Export Annotations
+      <i class="fa-solid fa-download"></i> Annotations
     </button>
     <button mat-raised-button color="warn" (click)="exportImage('png')">
-      Export Image (PNG)
+      <i class="fa-solid fa-download"></i> Image (PNG)
     </button>
     <button mat-raised-button color="warn" (click)="exportImage('jpg')">
-      Export Image (JPG)
+      <i class="fa-solid fa-download"></i> Image (JPG)
     </button>
   </div>
 </div>
